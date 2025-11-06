@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPD关系伤害评估测试</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .disclaimer {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .question:hover {
+            background: #e9ecef;
+        }
+        
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .option input {
+            display: none;
+        }
+        
+        .option label {
+            display: block;
+            padding: 10px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option input:checked + label {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .option label:hover {
+            background: #e3f2fd;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #prevBtn {
+            background: #95a5a6;
+        }
+        
+        #prevBtn:hover {
+            background: #7f8c8d;
+        }
+        
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .result {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        
+        .result h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 20px 0;
+        }
+        
+        .level {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .level-mild {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .level-moderate {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .level-severe {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .level-critical {
+            background: #fce4ec;
+            color: #ad1457;
+        }
+        
+        .recommendations {
+            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .recommendations h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .recommendations ul {
+            padding-left: 20px;
+        }
+        
+        .recommendations li {
+            margin-bottom: 10px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            .option {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NPD关系伤害评估测试</h1>
+            <p>评估您是否经历过自恋型人格障碍关系带来的伤害及其程度</p>
+        </div>
+        
+        <div class="disclaimer">
+            <p><strong>重要提示：</strong>本测试仅为自我评估工具，不能替代专业心理诊断。如果您感到严重困扰，请寻求合格心理健康专业人士的帮助。</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+        </div>
+        
+        <div class="section active" id="section1">
+            <h2 class="section-title">第一部分：经历描述</h2>
+            <p>请根据您过去关系中的经历，选择每个描述符合您感受的程度。</p>
+            
+            <div id="questions-part1">
+                <!-- 问题将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="buttons">
+                <button id="nextBtn1">下一步</button>
+            </div>
+        </div>
+        
+        <div class="section" id="section2">
+            <h2 class="section-title">第二部分：情境反应</h2>
+            
+            <div id="questions-part2">
+                <!-- 问题将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="buttons">
+                <button id="prevBtn1">上一步</button>
+                <button id="nextBtn2">查看结果</button>
+            </div>
+        </div>
+        
+        <div class="result" id="result">
+            <h2>您的测试结果</h2>
+            <div class="score" id="score">0</div>
+            <div class="level" id="level">轻度影响</div>
+            <div id="description">
+                <!-- 描述将通过JavaScript动态生成 -->
+            </div>
+            <div class="recommendations" id="recommendations">
+                <!-- 建议将通过JavaScript动态生成 -->
+            </div>
+            <button id="restartBtn">重新测试</button>
+        </div>
+    </div>
+
+    <script>
+        // 测试问题数据
+        const questionsPart1 = [
+            "我感到自己在这段关系中'永远不够好'",
+            "我需要小心翼翼地预测对方的情绪和反应",
+            "我的感受和需求被忽视或贬低",
+            "对方会扭曲事实，让我怀疑自己的记忆和判断",
+            "我为对方的行为找借口，甚至责备自己",
+            "我失去了以前的自信和自尊",
+            "我感到孤独，即使在这段关系中也如此",
+            "对方会间歇性地给予关爱和冷落，让我困惑",
+            "我害怕表达不同意见，担心引发冲突",
+            "我为维持这段关系放弃了重要兴趣和价值观",
+            "对方缺乏真正的共情能力",
+            "我感到自己被当作物品而非有感情的人对待",
+            "小的批评会引发我强烈的情绪反应",
+            "我发现自己反复思考与对方的互动",
+            "我为自己仍然在乎这段关系而感到羞愧",
+            "我注意到自己有焦虑或抑郁的症状",
+            "我难以信任自己的判断和决策",
+            "我感到情感上精疲力尽",
+            "我为他人的情绪和需求承担过多责任",
+            "我害怕设立边界，担心会失去这段关系"
+        ];
+        
+        const questionsPart2 = [
+            {
+                question: "当你回忆这段关系时，你通常会：",
+                options: [
+                    "感到困惑、自我怀疑，但能保持相对平静",
+                    "感到悲伤、愤怒，需要一些时间恢复平静",
+                    "感到强烈的情绪波动，可能需要几小时才能平静",
+                    "体验到身体和情绪的强烈反应，感觉被淹没，难以平静"
+                ]
+            },
+            {
+                question: "你现在如何看待自己在这段关系中的角色？",
+                options: [
+                    "基本认可自己的表现和处理方式",
+                    "有些后悔自己当时的某些选择",
+                    "常常责备自己没能更早识别问题",
+                    "感到深深的自我否定，认为自己是问题的根源"
+                ]
+            },
+            {
+                question: "这段关系对你当前生活的影响程度：",
+                options: [
+                    "偶尔想起，但不影响日常功能",
+                    "有时会影响我的情绪和决策",
+                    "明显影响我的人际关系和自我价值感",
+                    "严重妨碍我的日常生活和心理健康"
+                ]
+            }
+        ];
+        
+        // 初始化变量
+        let currentSection = 1;
+        const totalSections = 2;
+        const answers = {
+            part1: Array(questionsPart1.length).fill(null),
+            part2: Array(questionsPart2.length).fill(null)
+        };
+        
+        // DOM元素
+        const progressBar = document.getElementById('progress');
+        const section1 = document.getElementById('section1');
+        const section2 = document.getElementById('section2');
+        const resultSection = document.getElementById('result');
+        const questionsPart1Container = document.getElementById('questions-part1');
+        const questionsPart2Container = document.getElementById('questions-part2');
+        const nextBtn1 = document.getElementById('nextBtn1');
+        const prevBtn1 = document.getElementById('prevBtn1');
+        const nextBtn2 = document.getElementById('nextBtn2');
+        const restartBtn = document.getElementById('restartBtn');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const descriptionElement = document.getElementById('description');
+        const recommendationsElement = document.getElementById('recommendations');
+        
+        // 生成第一部分问题
+        function generatePart1Questions() {
+            questionsPart1.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = `${index + 1}. ${question}`;
+                questionElement.appendChild(questionText);
+                
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'options';
+                
+                const optionLabels = ['从不', '偶尔', '有时', '经常', '总是'];
+                optionLabels.forEach((label, optionIndex) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `q1-${index}`;
+                    input.value = optionIndex;
+                    input.id = `q1-${index}-${optionIndex}`;
+                    
+                    input.addEventListener('change', () => {
+                        answers.part1[index] = optionIndex;
+                        updateProgress();
+                    });
+                    
+                    const labelElement = document.createElement('label');
+                    labelElement.htmlFor = `q1-${index}-${optionIndex}`;
+                    labelElement.textContent = `${optionIndex} - ${label}`;
+                    
+                    optionDiv.appendChild(input);
+                    optionDiv.appendChild(labelElement);
+                    optionsContainer.appendChild(optionDiv);
+                });
+                
+                questionElement.appendChild(optionsContainer);
+                questionsPart1Container.appendChild(questionElement);
+            });
+        }
+        
+        // 生成第二部分问题
+        function generatePart2Questions() {
+            questionsPart2.forEach((item, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = `${index + 1}. ${item.question}`;
+                questionElement.appendChild(questionText);
+                
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'options';
+                
+                item.options.forEach((option, optionIndex) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `q2-${index}`;
+                    input.value = optionIndex;
+                    input.id = `q2-${index}-${optionIndex}`;
+                    
+                    input.addEventListener('change', () => {
+                        answers.part2[index] = optionIndex;
+                        updateProgress();
+                    });
+                    
+                    const labelElement = document.createElement('label');
+                    labelElement.htmlFor = `q2-${index}-${optionIndex}`;
+                    labelElement.textContent = option;
+                    
+                    optionDiv.appendChild(input);
+                    optionDiv.appendChild(labelElement);
+                    optionsContainer.appendChild(optionDiv);
+                });
+                
+                questionElement.appendChild(optionsContainer);
+                questionsPart2Container.appendChild(questionElement);
+            });
+        }
+        
+        // 更新进度条
+        function updateProgress() {
+            const totalQuestions = questionsPart1.length + questionsPart2.length;
+            let answeredCount = 0;
+            
+            // 计算已回答的问题数量
+            answers.part1.forEach(answer => {
+                if (answer !== null) answeredCount++;
+            });
+            
+            answers.part2.forEach(answer => {
+                if (answer !== null) answeredCount++;
+            });
+            
+            const progressPercentage = (answeredCount / totalQuestions) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            // 更新按钮状态
+            const allPart1Answered = answers.part1.every(answer => answer !== null);
+            nextBtn1.disabled = !allPart1Answered;
+            
+            const allPart2Answered = answers.part2.every(answer => answer !== null);
+            nextBtn2.disabled = !allPart2Answered;
+        }
+        
+        // 计算分数和结果
+        function calculateResults() {
+            // 第一部分分数计算
+            let part1Score = 0;
+            answers.part1.forEach(answer => {
+                if (answer !== null) part1Score += answer;
+            });
+            
+            // 第二部分分数计算 (A=0, B=1, C=2, D=3)
+            let part2Score = 0;
+            let dCount = 0;
+            answers.part2.forEach(answer => {
+                if (answer !== null) {
+                    part2Score += answer;
+                    if (answer === 3) dCount++;
+                }
+            });
+            
+            const totalScore = part1Score;
+            
+            // 确定伤害程度
+            let level, description, levelClass;
+            
+            if (totalScore <= 20 && dCount === 0) {
+                level = "轻度影响";
+                description = "您可能经历过一些NPD特质的行为，但保持了相对健康的自我边界和认知。伤害存在但未严重影响您的核心自我。";
+                levelClass = "level-mild";
+            } else if (totalScore <= 40 && dCount <= 1) {
+                level = "中度影响";
+                description = "您确实经历了NPD关系伤害，有明显的情绪影响和自我怀疑。恢复需要有意为之的自我工作和时间。";
+                levelClass = "level-moderate";
+            } else if (totalScore <= 60 && dCount <= 2) {
+                level = "较重影响";
+                description = "您经历了显著的NPD关系创伤，可能出现了CPTSD的某些症状。专业支持和系统的康复计划会对您有很大帮助。";
+                levelClass = "level-severe";
+            } else {
+                level = "严重影响";
+                description = "您经历了深度的心理创伤，可能严重影响您的自我认知和日常功能。强烈建议寻求专业心理帮助。";
+                levelClass = "level-critical";
+            }
+            
+            // 显示结果
+            scoreElement.textContent = totalScore;
+            levelElement.textContent = level;
+            levelElement.className = `level ${levelClass}`;
+            descriptionElement.innerHTML = `<p>${description}</p>`;
+            
+            // 生成建议
+            let recommendations = "<h3>康复建议</h3><ul>";
+            
+            if (totalScore <= 20) {
+                recommendations += `
+                    <li><strong>自我肯定练习：</strong>每天花几分钟肯定自己的价值和感受</li>
+                    <li><strong>设立健康边界：</strong>在关系中练习表达自己的需求和界限</li>
+                    <li><strong>情绪觉察：</strong>继续关注自己的情绪反应和内在体验</li>
+                `;
+            } else if (totalScore <= 40) {
+                recommendations += `
+                    <li><strong>重建内在对话：</strong>挑战自我批评的想法，培养自我同情</li>
+                    <li><strong>感官接地练习：</strong>当感到被回忆淹没时，使用5-4-3-2-1技巧（5样看到的东西，4样触摸的东西，3种声音，2种气味，1种味道）</li>
+                    <li><strong>小型边界设置：</strong>从简单的人际互动开始练习说"不"或"我需要考虑一下"</li>
+                `;
+            } else if (totalScore <= 60) {
+                recommendations += `
+                    <li><strong>寻求专业支持：</strong>考虑咨询擅长关系创伤的心理治疗师</li>
+                    <li><strong>加入支持小组：</strong>与其他有类似经历的人交流，减少孤立感</li>
+                    <li><strong>创伤知情疗法：</strong>探索眼动脱敏与再处理治疗、体感疗法等专门方法</li>
+                    <li><strong>自我照顾仪式：</strong>建立固定的自我照顾习惯，如冥想、艺术表达或自然接触</li>
+                `;
+            } else {
+                recommendations += `
+                    <li><strong>紧急专业帮助：</strong>强烈建议立即寻求合格心理健康专家的帮助</li>
+                    <li><strong>安全计划：</strong>如果您仍在有害关系中，制定安全离开的计划</li>
+                    <li><strong>危机资源：</strong>了解当地心理健康危机热线和资源</li>
+                    <li><strong>综合治疗：</strong>可能需要结合药物治疗和心理治疗的综合方案</li>
+                    <li><strong>支持系统：</strong>建立可靠的支持网络，包括朋友、家人和专业支持</li>
+                `;
+            }
+            
+            recommendations += "</ul>";
+            recommendationsElement.innerHTML = recommendations;
+        }
+        
+        // 导航功能
+        nextBtn1.addEventListener('click', () => {
+            section1.classList.remove('active');
+            section2.classList.add('active');
+            currentSection = 2;
+        });
+        
+        prevBtn1.addEventListener('click', () => {
+            section2.classList.remove('active');
+            section1.classList.add('active');
+            currentSection = 1;
+        });
+        
+        nextBtn2.addEventListener('click', () => {
+            section2.classList.remove('active');
+            resultSection.style.display = 'block';
+            calculateResults();
+        });
+        
+        restartBtn.addEventListener('click', () => {
+            // 重置所有答案
+            answers.part1 = Array(questionsPart1.length).fill(null);
+            answers.part2 = Array(questionsPart2.length).fill(null);
+            
+            // 清除所有单选按钮的选择
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+            });
+            
+            // 重置界面
+            resultSection.style.display = 'none';
+            section2.classList.remove('active');
+            section1.classList.add('active');
+            currentSection = 1;
+            updateProgress();
+        });
+        
+        // 初始化
+        generatePart1Questions();
+        generatePart2Questions();
+        updateProgress();
+    </script>
+</body>
+</html>
