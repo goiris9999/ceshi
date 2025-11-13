@@ -3,130 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NPD关系伤害评估测试</title>
+    <title>职业天赋测评系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
         
         body {
-            background-color: #f5f7fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
-        .header {
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .intro {
             text-align: center;
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eaeaea;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
         }
         
-        .header h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 28px;
+        .intro h2 {
+            color: #4b6cb7;
+            margin-bottom: 15px;
         }
         
-        .header p {
-            color: #7f8c8d;
-            font-size: 16px;
-        }
-        
-        .disclaimer {
-            background-color: #fff8e1;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin-bottom: 25px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        .section {
-            margin-bottom: 30px;
+        .test-section {
             display: none;
         }
         
-        .section.active {
+        .active {
             display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .section-title {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eaeaea;
         }
         
         .question {
             margin-bottom: 25px;
-            padding: 15px;
+            padding: 20px;
             background: #f8f9fa;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .question:hover {
-            background: #e9ecef;
-        }
-        
-        .question-text {
-            font-weight: 500;
+        .question h3 {
             margin-bottom: 15px;
-            color: #2c3e50;
+            color: #182848;
         }
         
         .options {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 10px;
         }
         
         .option {
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        .option input {
-            display: none;
-        }
-        
-        .option label {
-            display: block;
-            padding: 10px 15px;
+            padding: 12px 15px;
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            text-align: center;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s;
         }
         
-        .option input:checked + label {
-            background: #3498db;
+        .option:hover {
+            background: #edf2ff;
+            border-color: #4b6cb7;
+        }
+        
+        .option.selected {
+            background: #4b6cb7;
             color: white;
-            border-color: #3498db;
-        }
-        
-        .option label:hover {
-            background: #e3f2fd;
+            border-color: #4b6cb7;
         }
         
         .buttons {
@@ -137,512 +119,617 @@
         
         button {
             padding: 12px 25px;
-            background: #3498db;
+            background: #4b6cb7;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
         
         button:hover {
-            background: #2980b9;
+            background: #3a5795;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         button:disabled {
-            background: #bdc3c7;
+            background: #cccccc;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
         
-        #prevBtn {
-            background: #95a5a6;
+        .result-section {
+            text-align: center;
+            display: none;
         }
         
-        #prevBtn:hover {
-            background: #7f8c8d;
+        .radar-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
         }
         
-        .progress-container {
-            margin-bottom: 25px;
+        .career-recommendation {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .career-recommendation h3 {
+            color: #182848;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .career-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .career-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .restart-btn {
+            margin-top: 30px;
+            background: #28a745;
+        }
+        
+        .restart-btn:hover {
+            background: #218838;
         }
         
         .progress-bar {
             height: 8px;
-            background: #ecf0f1;
+            background: #e1e5eb;
             border-radius: 4px;
+            margin-bottom: 20px;
             overflow: hidden;
         }
         
         .progress {
             height: 100%;
-            background: #3498db;
+            background: #4b6cb7;
             width: 0%;
-            transition: width 0.5s ease;
+            transition: width 0.5s;
         }
         
-        .result {
-            text-align: center;
-            padding: 30px;
-            display: none;
-        }
-        
-        .result h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        
-        .score {
-            font-size: 48px;
-            font-weight: bold;
-            color: #e74c3c;
-            margin: 20px 0;
-        }
-        
-        .level {
-            font-size: 24px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        
-        .level-mild {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .level-moderate {
-            background: #fff3e0;
-            color: #ef6c00;
-        }
-        
-        .level-severe {
-            background: #ffebee;
-            color: #c62828;
-        }
-        
-        .level-critical {
-            background: #fce4ec;
-            color: #ad1457;
-        }
-        
-        .recommendations {
-            text-align: left;
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .recommendations h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-        
-        .recommendations ul {
-            padding-left: 20px;
-        }
-        
-        .recommendations li {
+        .question-counter {
+            text-align: right;
             margin-bottom: 10px;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .container {
-                padding: 15px;
+                border-radius: 10px;
             }
             
-            .options {
-                flex-direction: column;
+            header h1 {
+                font-size: 2rem;
             }
             
-            .option {
-                min-width: 100%;
+            .content {
+                padding: 20px;
+            }
+            
+            .career-list {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>NPD关系伤害评估测试</h1>
-            <p>评估您是否经历过自恋型人格障碍关系带来的伤害及其程度</p>
-        </div>
+        <header>
+            <h1>职业天赋测评系统</h1>
+            <p>发现你的天赋，找到最适合的职业方向</p>
+        </header>
         
-        <div class="disclaimer">
-            <p><strong>重要提示：</strong>本测试仅为自我评估工具，不能替代专业心理诊断。如果您感到严重困扰，请寻求合格心理健康专业人士的帮助。</p>
-        </div>
-        
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
-            </div>
-        </div>
-        
-        <div class="section active" id="section1">
-            <h2 class="section-title">第一部分：经历描述</h2>
-            <p>请根据您过去关系中的经历，选择每个描述符合您感受的程度。</p>
-            
-            <div id="questions-part1">
-                <!-- 问题将通过JavaScript动态生成 -->
+        <div class="content">
+            <div id="intro-section" class="intro active">
+                <h2>欢迎参加职业天赋测评</h2>
+                <p>本测评将通过一系列问题，评估你在不同领域的天赋倾向，并生成可视化的雷达图结果。</p>
+                <p>测评结束后，我们将根据你的天赋特点，推荐最适合的职业方向。</p>
+                <p>测评大约需要5-7分钟，请根据你的真实情况选择最符合的选项。</p>
+                <button id="start-btn">开始测评</button>
             </div>
             
-            <div class="buttons">
-                <button id="nextBtn1">下一步</button>
+            <div id="test-section" class="test-section">
+                <div class="question-counter">
+                    <span id="current-question">1</span>/<span id="total-questions">20</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+                <div id="question-container"></div>
+                <div class="buttons">
+                    <button id="prev-btn" disabled>上一题</button>
+                    <button id="next-btn">下一题</button>
+                </div>
             </div>
-        </div>
-        
-        <div class="section" id="section2">
-            <h2 class="section-title">第二部分：情境反应</h2>
             
-            <div id="questions-part2">
-                <!-- 问题将通过JavaScript动态生成 -->
+            <div id="result-section" class="result-section">
+                <h2>你的天赋测评结果</h2>
+                <div class="radar-container">
+                    <canvas id="radar-chart"></canvas>
+                </div>
+                <div class="career-recommendation">
+                    <h3>推荐职业方向</h3>
+                    <p id="result-description"></p>
+                    <div class="career-list" id="career-list"></div>
+                </div>
+                <button class="restart-btn" id="restart-btn">重新测评</button>
             </div>
-            
-            <div class="buttons">
-                <button id="prevBtn1">上一步</button>
-                <button id="nextBtn2">查看结果</button>
-            </div>
-        </div>
-        
-        <div class="result" id="result">
-            <h2>您的测试结果</h2>
-            <div class="score" id="score">0</div>
-            <div class="level" id="level">轻度影响</div>
-            <div id="description">
-                <!-- 描述将通过JavaScript动态生成 -->
-            </div>
-            <div class="recommendations" id="recommendations">
-                <!-- 建议将通过JavaScript动态生成 -->
-            </div>
-            <button id="restartBtn">重新测试</button>
         </div>
     </div>
 
     <script>
-        // 测试问题数据
-        const questionsPart1 = [
-            "我感到自己在这段关系中'永远不够好'",
-            "我需要小心翼翼地预测对方的情绪和反应",
-            "我的感受和需求被忽视或贬低",
-            "对方会扭曲事实，让我怀疑自己的记忆和判断",
-            "我为对方的行为找借口，甚至责备自己",
-            "我失去了以前的自信和自尊",
-            "我感到孤独，即使在这段关系中也如此",
-            "对方会间歇性地给予关爱和冷落，让我困惑",
-            "我害怕表达不同意见，担心引发冲突",
-            "我为维持这段关系放弃了重要兴趣和价值观",
-            "对方缺乏真正的共情能力",
-            "我感到自己被当作物品而非有感情的人对待",
-            "小的批评会引发我强烈的情绪反应",
-            "我发现自己反复思考与对方的互动",
-            "我为自己仍然在乎这段关系而感到羞愧",
-            "我注意到自己有焦虑或抑郁的症状",
-            "我难以信任自己的判断和决策",
-            "我感到情感上精疲力尽",
-            "我为他人的情绪和需求承担过多责任",
-            "我害怕设立边界，担心会失去这段关系"
+        // 天赋维度定义
+        const talentDimensions = [
+            { id: 'logic', name: '逻辑思维', description: '分析问题、推理判断的能力' },
+            { id: 'creative', name: '创造力', description: '产生新想法、创新的能力' },
+            { id: 'social', name: '社交能力', description: '与人沟通、建立关系的能力' },
+            { id: 'leadership', name: '领导力', description: '组织协调、影响他人的能力' },
+            { id: 'artistic', name: '艺术感知', description: '审美、艺术表达的能力' },
+            { id: 'technical', name: '技术应用', description: '操作工具、解决技术问题的能力' }
         ];
-        
-        const questionsPart2 = [
+
+        // 测评题目
+        const questions = [
             {
-                question: "当你回忆这段关系时，你通常会：",
+                text: "当你面对一个复杂问题时，你通常会：",
                 options: [
-                    "感到困惑、自我怀疑，但能保持相对平静",
-                    "感到悲伤、愤怒，需要一些时间恢复平静",
-                    "感到强烈的情绪波动，可能需要几小时才能平静",
-                    "体验到身体和情绪的强烈反应，感觉被淹没，难以平静"
+                    { text: "分析问题的各个部分，找出逻辑关系", scores: { logic: 5, technical: 3 } },
+                    { text: "寻找创新的解决方案，尝试不同方法", scores: { creative: 5, logic: 2 } },
+                    { text: "咨询他人意见，共同讨论解决方案", scores: { social: 5, leadership: 3 } },
+                    { text: "组织团队，分配任务来解决", scores: { leadership: 5, social: 3 } }
                 ]
             },
             {
-                question: "你现在如何看待自己在这段关系中的角色？",
+                text: "在空闲时间，你更喜欢：",
                 options: [
-                    "基本认可自己的表现和处理方式",
-                    "有些后悔自己当时的某些选择",
-                    "常常责备自己没能更早识别问题",
-                    "感到深深的自我否定，认为自己是问题的根源"
+                    { text: "解决谜题或玩策略游戏", scores: { logic: 5, technical: 2 } },
+                    { text: "创作艺术作品或写作", scores: { artistic: 5, creative: 4 } },
+                    { text: "与朋友聚会或参加社交活动", scores: { social: 5, leadership: 2 } },
+                    { text: "学习新技能或研究新技术", scores: { technical: 5, logic: 3 } }
                 ]
             },
             {
-                question: "这段关系对你当前生活的影响程度：",
+                text: "当团队需要做决定时，你通常会：",
                 options: [
-                    "偶尔想起，但不影响日常功能",
-                    "有时会影响我的情绪和决策",
-                    "明显影响我的人际关系和自我价值感",
-                    "严重妨碍我的日常生活和心理健康"
+                    { text: "提供数据分析支持决策", scores: { logic: 5, technical: 2 } },
+                    { text: "提出新颖的想法和方案", scores: { creative: 5, artistic: 2 } },
+                    { text: "协调不同意见，促进共识", scores: { social: 5, leadership: 3 } },
+                    { text: "组织讨论，引导团队方向", scores: { leadership: 5, social: 3 } }
+                ]
+            },
+            {
+                text: "对于新学的知识，你更容易掌握：",
+                options: [
+                    { text: "需要逻辑推理和系统思维的内容", scores: { logic: 5, technical: 2 } },
+                    { text: "需要想象力和创造性的内容", scores: { creative: 5, artistic: 3 } },
+                    { text: "需要与人互动和实践的内容", scores: { social: 5, leadership: 2 } },
+                    { text: "需要动手操作和技术应用的内容", scores: { technical: 5, logic: 2 } }
+                ]
+            },
+            {
+                text: "在项目中，你更擅长：",
+                options: [
+                    { text: "制定详细的计划和步骤", scores: { logic: 5, leadership: 2 } },
+                    { text: "设计美观的界面或视觉效果", scores: { artistic: 5, creative: 3 } },
+                    { text: "与客户或团队成员沟通", scores: { social: 5, leadership: 2 } },
+                    { text: "解决技术难题和故障", scores: { technical: 5, logic: 3 } }
+                ]
+            },
+            {
+                text: "当遇到挫折时，你通常会：",
+                options: [
+                    { text: "分析失败原因，调整策略", scores: { logic: 5, technical: 2 } },
+                    { text: "尝试全新的方法或角度", scores: { creative: 5, artistic: 2 } },
+                    { text: "寻求他人的支持和鼓励", scores: { social: 5, leadership: 1 } },
+                    { text: "鼓励团队，保持士气", scores: { leadership: 5, social: 3 } }
+                ]
+            },
+            {
+                text: "你更享受哪种类型的工作：",
+                options: [
+                    { text: "需要精确计算和分析的工作", scores: { logic: 5, technical: 2 } },
+                    { text: "需要创意和设计的工作", scores: { creative: 5, artistic: 4 } },
+                    { text: "需要与人打交道的工作", scores: { social: 5, leadership: 2 } },
+                    { text: "需要管理和协调的工作", scores: { leadership: 5, social: 3 } }
+                ]
+            },
+            {
+                text: "在学习新技能时，你更注重：",
+                options: [
+                    { text: "理解其背后的原理和逻辑", scores: { logic: 5, technical: 2 } },
+                    { text: "如何用它来表达自己的想法", scores: { artistic: 5, creative: 3 } },
+                    { text: "如何用它来帮助他人", scores: { social: 5, leadership: 2 } },
+                    { text: "如何用它来提高效率", scores: { technical: 5, logic: 3 } }
+                ]
+            },
+            {
+                text: "在团队中，你通常扮演的角色是：",
+                options: [
+                    { text: "分析问题提供解决方案的人", scores: { logic: 5, technical: 2 } },
+                    { text: "提出创新想法的人", scores: { creative: 5, artistic: 2 } },
+                    { text: "协调沟通的人", scores: { social: 5, leadership: 2 } },
+                    { text: "组织领导和决策的人", scores: { leadership: 5, social: 2 } }
+                ]
+            },
+            {
+                text: "你更欣赏哪种类型的美：",
+                options: [
+                    { text: "数学公式和科学理论的简洁美", scores: { logic: 5, technical: 2 } },
+                    { text: "艺术作品和文学创作的表达美", scores: { artistic: 5, creative: 4 } },
+                    { text: "人际关系的和谐美", scores: { social: 5, leadership: 1 } },
+                    { text: "高效系统和流程的秩序美", scores: { leadership: 5, technical: 2 } }
+                ]
+            },
+            {
+                text: "当需要学习新软件或工具时，你通常会：",
+                options: [
+                    { text: "研究其工作原理和逻辑结构", scores: { logic: 5, technical: 3 } },
+                    { text: "尝试用它创造有趣的东西", scores: { creative: 5, artistic: 3 } },
+                    { text: "向他人请教或一起学习", scores: { social: 5, leadership: 1 } },
+                    { text: "探索其全部功能并掌握", scores: { technical: 5, logic: 2 } }
+                ]
+            },
+            {
+                text: "在解决问题时，你更倾向于：",
+                options: [
+                    { text: "使用系统性的分析方法", scores: { logic: 5, technical: 2 } },
+                    { text: "尝试非传统的创新方法", scores: { creative: 5, artistic: 2 } },
+                    { text: "征求多方面的意见", scores: { social: 5, leadership: 2 } },
+                    { text: "制定行动计划并执行", scores: { leadership: 5, logic: 2 } }
+                ]
+            },
+            {
+                text: "你更喜欢的工作环境是：",
+                options: [
+                    { text: "安静、独立、专注的环境", scores: { logic: 4, technical: 3 } },
+                    { text: "充满创意和灵感的环境", scores: { creative: 5, artistic: 4 } },
+                    { text: "充满人际互动的环境", scores: { social: 5, leadership: 2 } },
+                    { text: "有明确目标和挑战的环境", scores: { leadership: 5, technical: 2 } }
+                ]
+            },
+            {
+                text: "你更擅长：",
+                options: [
+                    { text: "发现数据中的模式和规律", scores: { logic: 5, technical: 2 } },
+                    { text: "将抽象概念转化为具体形象", scores: { artistic: 5, creative: 4 } },
+                    { text: "理解他人的情感和需求", scores: { social: 5, leadership: 2 } },
+                    { text: "组织和协调资源完成任务", scores: { leadership: 5, social: 3 } }
+                ]
+            },
+            {
+                text: "当面对技术问题时，你通常会：",
+                options: [
+                    { text: "分析问题的根本原因", scores: { logic: 5, technical: 3 } },
+                    { text: "尝试不同的解决方法", scores: { creative: 5, technical: 2 } },
+                    { text: "寻求专家或同事的帮助", scores: { social: 5, leadership: 1 } },
+                    { text: "系统地排除故障", scores: { technical: 5, logic: 3 } }
+                ]
+            },
+            {
+                text: "在团队合作中，你最重要的贡献是：",
+                options: [
+                    { text: "提供理性分析和决策支持", scores: { logic: 5, technical: 2 } },
+                    { text: "提供创意和新颖的视角", scores: { creative: 5, artistic: 3 } },
+                    { text: "促进团队沟通和协作", scores: { social: 5, leadership: 2 } },
+                    { text: "确保项目按计划推进", scores: { leadership: 5, social: 2 } }
+                ]
+            },
+            {
+                text: "你更喜欢的学习方式是：",
+                options: [
+                    { text: "通过逻辑推理和系统学习", scores: { logic: 5, technical: 2 } },
+                    { text: "通过实践和创造性尝试", scores: { creative: 5, artistic: 3 } },
+                    { text: "通过与他人讨论和交流", scores: { social: 5, leadership: 2 } },
+                    { text: "通过解决实际问题", scores: { technical: 5, logic: 3 } }
+                ]
+            },
+            {
+                text: "你更重视：",
+                options: [
+                    { text: "事物的真实性和准确性", scores: { logic: 5, technical: 2 } },
+                    { text: "事物的美感和表达力", scores: { artistic: 5, creative: 4 } },
+                    { text: "人际关系和情感连接", scores: { social: 5, leadership: 1 } },
+                    { text: "效率和成果", scores: { leadership: 5, technical: 2 } }
+                ]
+            },
+            {
+                text: "在规划项目时，你更注重：",
+                options: [
+                    { text: "逻辑结构和可行性", scores: { logic: 5, technical: 2 } },
+                    { text: "创新点和独特性", scores: { creative: 5, artistic: 2 } },
+                    { text: "团队协作和沟通", scores: { social: 5, leadership: 2 } },
+                    { text: "资源分配和时间管理", scores: { leadership: 5, technical: 2 } }
+                ]
+            },
+            {
+                text: "你更愿意被描述为：",
+                options: [
+                    { text: "理性、分析能力强", scores: { logic: 5, technical: 2 } },
+                    { text: "有创意、想象力丰富", scores: { creative: 5, artistic: 3 } },
+                    { text: "善于交际、同理心强", scores: { social: 5, leadership: 2 } },
+                    { text: "有领导力、决策力强", scores: { leadership: 5, social: 2 } }
                 ]
             }
         ];
-        
-        // 初始化变量
-        let currentSection = 1;
-        const totalSections = 2;
-        const answers = {
-            part1: Array(questionsPart1.length).fill(null),
-            part2: Array(questionsPart2.length).fill(null)
+
+        // 职业推荐
+        const careerRecommendations = {
+            logic: ["数据分析师", "软件工程师", "金融分析师", "研究员", "系统架构师"],
+            creative: ["产品经理", "广告创意总监", "作家", "设计师", "创新顾问"],
+            social: ["销售经理", "人力资源专员", "心理咨询师", "教师", "客户关系经理"],
+            leadership: ["项目经理", "团队负责人", "企业高管", "创业家", "公共管理者"],
+            artistic: ["平面设计师", "UI/UX设计师", "摄影师", "艺术总监", "建筑师"],
+            technical: ["工程师", "IT专家", "技术顾问", "数据分析师", "网络安全专家"]
         };
-        
-        // DOM元素
-        const progressBar = document.getElementById('progress');
-        const section1 = document.getElementById('section1');
-        const section2 = document.getElementById('section2');
-        const resultSection = document.getElementById('result');
-        const questionsPart1Container = document.getElementById('questions-part1');
-        const questionsPart2Container = document.getElementById('questions-part2');
-        const nextBtn1 = document.getElementById('nextBtn1');
-        const prevBtn1 = document.getElementById('prevBtn1');
-        const nextBtn2 = document.getElementById('nextBtn2');
-        const restartBtn = document.getElementById('restartBtn');
-        const scoreElement = document.getElementById('score');
-        const levelElement = document.getElementById('level');
-        const descriptionElement = document.getElementById('description');
-        const recommendationsElement = document.getElementById('recommendations');
-        
-        // 生成第一部分问题
-        function generatePart1Questions() {
-            questionsPart1.forEach((question, index) => {
-                const questionElement = document.createElement('div');
-                questionElement.className = 'question';
-                
-                const questionText = document.createElement('div');
-                questionText.className = 'question-text';
-                questionText.textContent = `${index + 1}. ${question}`;
-                questionElement.appendChild(questionText);
-                
-                const optionsContainer = document.createElement('div');
-                optionsContainer.className = 'options';
-                
-                const optionLabels = ['从不', '偶尔', '有时', '经常', '总是'];
-                optionLabels.forEach((label, optionIndex) => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.className = 'option';
-                    
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = `q1-${index}`;
-                    input.value = optionIndex;
-                    input.id = `q1-${index}-${optionIndex}`;
-                    
-                    input.addEventListener('change', () => {
-                        answers.part1[index] = optionIndex;
-                        updateProgress();
-                    });
-                    
-                    const labelElement = document.createElement('label');
-                    labelElement.htmlFor = `q1-${index}-${optionIndex}`;
-                    labelElement.textContent = `${optionIndex} - ${label}`;
-                    
-                    optionDiv.appendChild(input);
-                    optionDiv.appendChild(labelElement);
-                    optionsContainer.appendChild(optionDiv);
-                });
-                
-                questionElement.appendChild(optionsContainer);
-                questionsPart1Container.appendChild(questionElement);
+
+        // 结果描述
+        const resultDescriptions = {
+            logic: "你的逻辑思维能力突出，善于分析复杂问题，找出其中的规律和联系。",
+            creative: "你具有丰富的创造力和想象力，能够提出新颖的想法和解决方案。",
+            social: "你拥有出色的社交能力，善于与人沟通，建立良好的人际关系。",
+            leadership: "你具备优秀的领导才能，能够组织和激励团队实现共同目标。",
+            artistic: "你对美有独特的感知力，擅长通过艺术形式表达思想和情感。",
+            technical: "你在技术应用方面能力突出，善于使用工具解决实际问题。"
+        };
+
+        // 全局变量
+        let currentQuestionIndex = 0;
+        let userScores = {};
+        let selectedOptions = new Array(questions.length).fill(null);
+
+        // 初始化分数
+        function initializeScores() {
+            talentDimensions.forEach(dimension => {
+                userScores[dimension.id] = 0;
             });
         }
-        
-        // 生成第二部分问题
-        function generatePart2Questions() {
-            questionsPart2.forEach((item, index) => {
-                const questionElement = document.createElement('div');
-                questionElement.className = 'question';
-                
-                const questionText = document.createElement('div');
-                questionText.className = 'question-text';
-                questionText.textContent = `${index + 1}. ${item.question}`;
-                questionElement.appendChild(questionText);
-                
-                const optionsContainer = document.createElement('div');
-                optionsContainer.className = 'options';
-                
-                item.options.forEach((option, optionIndex) => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.className = 'option';
-                    
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = `q2-${index}`;
-                    input.value = optionIndex;
-                    input.id = `q2-${index}-${optionIndex}`;
-                    
-                    input.addEventListener('change', () => {
-                        answers.part2[index] = optionIndex;
-                        updateProgress();
-                    });
-                    
-                    const labelElement = document.createElement('label');
-                    labelElement.htmlFor = `q2-${index}-${optionIndex}`;
-                    labelElement.textContent = option;
-                    
-                    optionDiv.appendChild(input);
-                    optionDiv.appendChild(labelElement);
-                    optionsContainer.appendChild(optionDiv);
+
+        // 显示题目
+        function displayQuestion() {
+            const questionContainer = document.getElementById('question-container');
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            let questionHTML = `<div class="question">
+                <h3>${currentQuestion.text}</h3>
+                <div class="options">`;
+            
+            currentQuestion.options.forEach((option, index) => {
+                const isSelected = selectedOptions[currentQuestionIndex] === index;
+                questionHTML += `
+                    <div class="option ${isSelected ? 'selected' : ''}" data-index="${index}">
+                        ${option.text}
+                    </div>
+                `;
+            });
+            
+            questionHTML += `</div></div>`;
+            questionContainer.innerHTML = questionHTML;
+            
+            // 更新进度条和题目计数
+            updateProgress();
+            
+            // 添加选项点击事件
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const optionIndex = parseInt(this.getAttribute('data-index'));
+                    selectOption(optionIndex);
                 });
-                
-                questionElement.appendChild(optionsContainer);
-                questionsPart2Container.appendChild(questionElement);
             });
         }
-        
-        // 更新进度条
+
+        // 选择选项
+        function selectOption(optionIndex) {
+            // 清除之前的选择
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 标记当前选择
+            document.querySelectorAll('.option')[optionIndex].classList.add('selected');
+            
+            // 保存选择
+            selectedOptions[currentQuestionIndex] = optionIndex;
+            
+            // 启用下一题按钮
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        // 更新进度
         function updateProgress() {
-            const totalQuestions = questionsPart1.length + questionsPart2.length;
-            let answeredCount = 0;
-            
-            // 计算已回答的问题数量
-            answers.part1.forEach(answer => {
-                if (answer !== null) answeredCount++;
-            });
-            
-            answers.part2.forEach(answer => {
-                if (answer !== null) answeredCount++;
-            });
-            
-            const progressPercentage = (answeredCount / totalQuestions) * 100;
-            progressBar.style.width = `${progressPercentage}%`;
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            document.getElementById('total-questions').textContent = questions.length;
             
             // 更新按钮状态
-            const allPart1Answered = answers.part1.every(answer => answer !== null);
-            nextBtn1.disabled = !allPart1Answered;
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
             
-            const allPart2Answered = answers.part2.every(answer => answer !== null);
-            nextBtn2.disabled = !allPart2Answered;
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('next-btn').textContent = '查看结果';
+            } else {
+                document.getElementById('next-btn').textContent = '下一题';
+            }
         }
-        
-        // 计算分数和结果
-        function calculateResults() {
-            // 第一部分分数计算
-            let part1Score = 0;
-            answers.part1.forEach(answer => {
-                if (answer !== null) part1Score += answer;
-            });
+
+        // 计算总分
+        function calculateScores() {
+            initializeScores();
             
-            // 第二部分分数计算 (A=0, B=1, C=2, D=3)
-            let part2Score = 0;
-            let dCount = 0;
-            answers.part2.forEach(answer => {
-                if (answer !== null) {
-                    part2Score += answer;
-                    if (answer === 3) dCount++;
+            selectedOptions.forEach((selectedIndex, questionIndex) => {
+                if (selectedIndex !== null) {
+                    const optionScores = questions[questionIndex].options[selectedIndex].scores;
+                    
+                    for (const dimension in optionScores) {
+                        userScores[dimension] += optionScores[dimension];
+                    }
+                }
+            });
+        }
+
+        // 显示结果
+        function showResults() {
+            calculateScores();
+            
+            // 准备雷达图数据
+            const labels = talentDimensions.map(d => d.name);
+            const data = talentDimensions.map(d => userScores[d.id]);
+            
+            // 绘制雷达图
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '你的天赋分布',
+                        data: data,
+                        backgroundColor: 'rgba(75, 108, 183, 0.2)',
+                        borderColor: 'rgba(75, 108, 183, 1)',
+                        pointBackgroundColor: 'rgba(75, 108, 183, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(75, 108, 183, 1)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 30
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
                 }
             });
             
-            const totalScore = part1Score;
+            // 找出得分最高的维度
+            let maxScore = 0;
+            let topDimensions = [];
             
-            // 确定伤害程度
-            let level, description, levelClass;
-            
-            if (totalScore <= 20 && dCount === 0) {
-                level = "轻度影响";
-                description = "您可能经历过一些NPD特质的行为，但保持了相对健康的自我边界和认知。伤害存在但未严重影响您的核心自我。";
-                levelClass = "level-mild";
-            } else if (totalScore <= 40 && dCount <= 1) {
-                level = "中度影响";
-                description = "您确实经历了NPD关系伤害，有明显的情绪影响和自我怀疑。恢复需要有意为之的自我工作和时间。";
-                levelClass = "level-moderate";
-            } else if (totalScore <= 60 && dCount <= 2) {
-                level = "较重影响";
-                description = "您经历了显著的NPD关系创伤，可能出现了CPTSD的某些症状。专业支持和系统的康复计划会对您有很大帮助。";
-                levelClass = "level-severe";
-            } else {
-                level = "严重影响";
-                description = "您经历了深度的心理创伤，可能严重影响您的自我认知和日常功能。强烈建议寻求专业心理帮助。";
-                levelClass = "level-critical";
+            for (const dimension in userScores) {
+                if (userScores[dimension] > maxScore) {
+                    maxScore = userScores[dimension];
+                    topDimensions = [dimension];
+                } else if (userScores[dimension] === maxScore) {
+                    topDimensions.push(dimension);
+                }
             }
             
-            // 显示结果
-            scoreElement.textContent = totalScore;
-            levelElement.textContent = level;
-            levelElement.className = `level ${levelClass}`;
-            descriptionElement.innerHTML = `<p>${description}</p>`;
-            
-            // 生成建议
-            let recommendations = "<h3>康复建议</h3><ul>";
-            
-            if (totalScore <= 20) {
-                recommendations += `
-                    <li><strong>自我肯定练习：</strong>每天花几分钟肯定自己的价值和感受</li>
-                    <li><strong>设立健康边界：</strong>在关系中练习表达自己的需求和界限</li>
-                    <li><strong>情绪觉察：</strong>继续关注自己的情绪反应和内在体验</li>
-                `;
-            } else if (totalScore <= 40) {
-                recommendations += `
-                    <li><strong>重建内在对话：</strong>挑战自我批评的想法，培养自我同情</li>
-                    <li><strong>感官接地练习：</strong>当感到被回忆淹没时，使用5-4-3-2-1技巧（5样看到的东西，4样触摸的东西，3种声音，2种气味，1种味道）</li>
-                    <li><strong>小型边界设置：</strong>从简单的人际互动开始练习说"不"或"我需要考虑一下"</li>
-                `;
-            } else if (totalScore <= 60) {
-                recommendations += `
-                    <li><strong>寻求专业支持：</strong>考虑咨询擅长关系创伤的心理治疗师</li>
-                    <li><strong>加入支持小组：</strong>与其他有类似经历的人交流，减少孤立感</li>
-                    <li><strong>创伤知情疗法：</strong>探索眼动脱敏与再处理治疗、体感疗法等专门方法</li>
-                    <li><strong>自我照顾仪式：</strong>建立固定的自我照顾习惯，如冥想、艺术表达或自然接触</li>
-                `;
-            } else {
-                recommendations += `
-                    <li><strong>紧急专业帮助：</strong>强烈建议立即寻求合格心理健康专家的帮助</li>
-                    <li><strong>安全计划：</strong>如果您仍在有害关系中，制定安全离开的计划</li>
-                    <li><strong>危机资源：</strong>了解当地心理健康危机热线和资源</li>
-                    <li><strong>综合治疗：</strong>可能需要结合药物治疗和心理治疗的综合方案</li>
-                    <li><strong>支持系统：</strong>建立可靠的支持网络，包括朋友、家人和专业支持</li>
-                `;
-            }
-            
-            recommendations += "</ul>";
-            recommendationsElement.innerHTML = recommendations;
-        }
-        
-        // 导航功能
-        nextBtn1.addEventListener('click', () => {
-            section1.classList.remove('active');
-            section2.classList.add('active');
-            currentSection = 2;
-        });
-        
-        prevBtn1.addEventListener('click', () => {
-            section2.classList.remove('active');
-            section1.classList.add('active');
-            currentSection = 1;
-        });
-        
-        nextBtn2.addEventListener('click', () => {
-            section2.classList.remove('active');
-            resultSection.style.display = 'block';
-            calculateResults();
-        });
-        
-        restartBtn.addEventListener('click', () => {
-            // 重置所有答案
-            answers.part1 = Array(questionsPart1.length).fill(null);
-            answers.part2 = Array(questionsPart2.length).fill(null);
-            
-            // 清除所有单选按钮的选择
-            document.querySelectorAll('input[type="radio"]').forEach(input => {
-                input.checked = false;
+            // 生成结果描述
+            let description = "根据测评结果，";
+            topDimensions.forEach((dimension, index) => {
+                const dimInfo = talentDimensions.find(d => d.id === dimension);
+                description += resultDescriptions[dimension];
+                
+                if (index < topDimensions.length - 1) {
+                    description += "同时，";
+                }
             });
             
-            // 重置界面
-            resultSection.style.display = 'none';
-            section2.classList.remove('active');
-            section1.classList.add('active');
-            currentSection = 1;
-            updateProgress();
-        });
-        
-        // 初始化
-        generatePart1Questions();
-        generatePart2Questions();
-        updateProgress();
+            document.getElementById('result-description').textContent = description;
+            
+            // 生成职业推荐
+            const careerList = document.getElementById('career-list');
+            careerList.innerHTML = '';
+            
+            topDimensions.forEach(dimension => {
+                careerRecommendations[dimension].forEach(career => {
+                    const careerItem = document.createElement('div');
+                    careerItem.className = 'career-item';
+                    careerItem.textContent = career;
+                    careerList.appendChild(careerItem);
+                });
+            });
+            
+            // 显示结果部分
+            document.getElementById('test-section').classList.remove('active');
+            document.getElementById('result-section').style.display = 'block';
+        }
+
+        // 初始化应用
+        function initApp() {
+            initializeScores();
+            
+            // 开始按钮事件
+            document.getElementById('start-btn').addEventListener('click', function() {
+                document.getElementById('intro-section').classList.remove('active');
+                document.getElementById('test-section').classList.add('active');
+                displayQuestion();
+            });
+            
+            // 上一题按钮事件
+            document.getElementById('prev-btn').addEventListener('click', function() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    displayQuestion();
+                    
+                    // 如果之前已经选择过这一题，启用下一题按钮
+                    if (selectedOptions[currentQuestionIndex] !== null) {
+                        document.getElementById('next-btn').disabled = false;
+                    }
+                }
+            });
+            
+            // 下一题按钮事件
+            document.getElementById('next-btn').addEventListener('click', function() {
+                if (selectedOptions[currentQuestionIndex] === null) {
+                    alert('请选择一项后再继续');
+                    return;
+                }
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                    
+                    // 如果之前已经选择过这一题，恢复选择状态
+                    if (selectedOptions[currentQuestionIndex] !== null) {
+                        document.querySelectorAll('.option')[selectedOptions[currentQuestionIndex]].classList.add('selected');
+                        document.getElementById('next-btn').disabled = false;
+                    } else {
+                        document.getElementById('next-btn').disabled = true;
+                    }
+                } else {
+                    // 最后一题，显示结果
+                    showResults();
+                }
+            });
+            
+            // 重新测评按钮事件
+            document.getElementById('restart-btn').addEventListener('click', function() {
+                currentQuestionIndex = 0;
+                selectedOptions.fill(null);
+                initializeScores();
+                
+                document.getElementById('result-section').style.display = 'none';
+                document.getElementById('intro-section').classList.add('active');
+            });
+        }
+
+        // 当页面加载完成后初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
